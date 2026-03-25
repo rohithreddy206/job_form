@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Application | TalentBridge</title>
+  <meta name="description" content="Apply for a position at TalentBridge. Fill in your professional details and upload your resume." />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#f0f4ff', 100: '#dbe4ff', 500: '#4361ee', 600: '#3a56d4', 700: '#2f44b0' },
+          },
+          boxShadow: {
+            card: '0 4px 32px 0 rgba(67,97,238,0.08)',
+            'card-hover': '0 8px 40px 0 rgba(67,97,238,0.14)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    /* Gradient background */
+    .page-bg {
+      background: linear-gradient(135deg, #f0f4ff 0%, #fafafa 50%, #f0f4ff 100%);
+      min-height: 100vh;
+    }
+
+    /* Navbar gradient */
+    .navbar { background: linear-gradient(90deg, #1e3a8a 0%, #4361ee 100%); }
+
+    /* Section header underline */
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 3px;
+      background: #4361ee;
+      border-radius: 9999px;
+      margin-top: 6px;
+    }
+
+    /* Input focus ring */
+    .field-input:focus { outline: none; border-color: #4361ee; box-shadow: 0 0 0 3px rgba(67,97,238,0.12); }
+    .field-input { transition: border-color 0.2s, box-shadow 0.2s; }
+    .field-input.is-error { border-color: #ef4444 !important; }
+
+    /* Floating label icon */
+    .input-wrap { position: relative; }
+    .input-wrap .fi { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; font-size: 14px; }
+    .input-wrap .textarea-icon { top: 16px; transform: none; }
+    .input-with-icon { padding-left: 40px !important; }
+
+    /* Progress bar */
+    .progress-track { background: #e2e8f0; border-radius: 9999px; overflow: hidden; }
+    .progress-fill { background: linear-gradient(90deg, #4361ee, #7b5ea7); border-radius: 9999px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+
+    /* Step badges */
+    .step-badge {
+      width: 28px; height: 28px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, color 0.3s;
+    }
+    .step-badge.active { background: #4361ee; color: #fff; }
+    .step-badge.done { background: #10b981; color: #fff; }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #4361ee; background: #f0f4ff; }
+    .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+    /* Submit button */
+    .btn-primary {
+      background: linear-gradient(90deg, #4361ee, #3a56d4);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 28px;
+      width: 100%;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(67,97,238,0.3);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-primary:hover:not(:disabled) { opacity: 0.92; box-shadow: 0 6px 20px rgba(67,97,238,0.4); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 0.8s linear infinite; display: none; }
+    .spinner.show { display: inline-block; }
+
+    /* Error message */
+    .field-error { color: #ef4444; font-size: 12px; margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+
+    /* Error banner */
+    .error-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 18px; color: #b91c1c; }
+
+    /* Card animation */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.5s ease both; }
+
+    /* Select arrow */
+    .field-select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 12px center; background-repeat: no-repeat; background-size: 20px; }
+  </style>
+</head>
+<body class="page-bg">
+
+  <!-- ════════════════ NAVBAR ════════════════ -->
+  <nav class="navbar sticky top-0 z-50 shadow-md">
+    <div class="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+          <i class="fa-solid fa-briefcase text-white text-base"></i>
+        </div>
+        <span class="text-white font-bold text-lg tracking-wide">TalentBridge</span>
+      </div>
+      <span class="text-white/60 text-sm hidden sm:block">Careers Portal</span>
+    </div>
+  </nav>
+
+  <!-- ════════════════ HERO HEADER ════════════════ -->
+  <div class="bg-gradient-to-br from-[#1e3a8a] to-[#4361ee] py-10 px-5 text-center">
+    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Job Application Form</h1>
+    <p class="text-blue-200 text-base">Please fill in your details carefully. We review every application personally.</p>
+  </div>
+
+  <!-- ════════════════ MAIN CONTENT ════════════════ -->
+  <main class="max-w-3xl mx-auto px-4 py-10">
+
+    <!-- Error Banner -->
+    {% if errors %}
+    <div class="error-banner mb-6 animate-fade-up flex gap-3">
+      <i class="fa-solid fa-circle-exclamation text-lg flex-shrink-0 mt-0.5"></i>
+      <div>
+        <p class="font-semibold mb-1">Please fix the following errors:</p>
+        <ul class="list-disc list-inside space-y-0.5 text-sm">
+          {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Progress ──────────────────────────────────── -->
+    <div class="bg-white rounded-2xl shadow-card px-6 py-5 mb-6 animate-fade-up">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Application Progress</span>
+        <span id="progressLabel" class="text-sm font-bold text-brand-500">0% Complete</span>
+      </div>
+      <div class="progress-track h-2.5 mb-4">
+        <div id="progressBar" class="progress-fill h-full" style="width:0%"></div>
+      </div>
+      <div class="grid grid-cols-4 gap-2 text-center">
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-badge active" id="step1">1</div>
+          <span class="text-[10px] text-slate-400 font-medium">Personal</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-badge" id="step2">2</div>
+          <span class="text-[10px] text-slate-400 font-medium">Professional</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-badge" id="step3">3</div>
+          <span class="text-[10px] text-slate-400 font-medium">Salary</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-badge" id="step4">4</div>
+          <span class="text-[10px] text-slate-400 font-medium">Resume</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── THE FORM CARD ─────────────────────────── -->
+    <div class="bg-white rounded-2xl shadow-card px-6 sm:px-8 py-8 animate-fade-up" style="animation-delay:0.08s">
+      <form id="applicationForm" method="POST" action="/submit" enctype="multipart/form-data" novalidate>
+
+        <!-- ════ SECTION 1: Personal Details ════ -->
+        <div id="section-personal" class="mb-8">
+          <h2 class="section-title text-base font-bold text-slate-800 mb-5">
+            <i class="fa-solid fa-user text-brand-500 mr-2"></i>Personal Details
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <!-- First Name -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="first_name">First Name <span class="text-red-400">*</span></label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-user"></i>
+                <input type="text" id="first_name" name="first_name" autocomplete="given-name"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. Priya" />
+              </div>
+              <p class="field-error" id="firstNameError">First name is required.</p>
+            </div>
+
+            <!-- Last Name -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="last_name">Last Name <span class="text-red-400">*</span></label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-user"></i>
+                <input type="text" id="last_name" name="last_name" autocomplete="family-name"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. Sharma" />
+              </div>
+              <p class="field-error" id="lastNameError">Last name is required.</p>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="phone_number">Phone Number <span class="text-red-400">*</span></label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-phone"></i>
+                <input type="tel" id="phone_number" name="phone_number" autocomplete="tel"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="+91 98765 43210" />
+              </div>
+              <p class="field-error" id="phoneError">Enter a valid phone number.</p>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="email">Email Address <span class="text-red-400">*</span></label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-envelope"></i>
+                <input type="email" id="email" name="email" autocomplete="email"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="you@example.com" />
+              </div>
+              <p class="field-error" id="emailError">Enter a valid email address.</p>
+            </div>
+
+            <!-- Current Location -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="current_location">Current Location</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-location-dot"></i>
+                <input type="text" id="current_location" name="current_location"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. Bengaluru, Karnataka" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <hr class="border-slate-100 mb-8" />
+
+        <!-- ════ SECTION 2: Professional Details ════ -->
+        <div id="section-professional" class="mb-8">
+          <h2 class="section-title text-base font-bold text-slate-800 mb-5">
+            <i class="fa-solid fa-building text-brand-500 mr-2"></i>Professional Details
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <!-- Current Company -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="current_company">Current / Last Company</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-city"></i>
+                <input type="text" id="current_company" name="current_company"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. Infosys Limited" />
+              </div>
+            </div>
+
+            <!-- Total Experience -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="total_experience">Total Experience (Years)</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-briefcase-clock" style="font-size:13px"></i>
+                <input type="number" id="total_experience" name="total_experience" min="0" max="60"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. 5" />
+              </div>
+            </div>
+
+            <!-- Relevant Experience -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="relevant_experience">Relevant Experience (Years)</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-chart-line" style="font-size:13px"></i>
+                <input type="number" id="relevant_experience" name="relevant_experience" min="0" max="60"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. 3" />
+              </div>
+            </div>
+
+            <!-- Education -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="education">Highest Education</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-graduation-cap"></i>
+                <select id="education" name="education"
+                  class="field-input field-select input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800">
+                  <option value="">-- Select Qualification --</option>
+                  <option value="High School">High School / 12th</option>
+                  <option value="Diploma">Diploma</option>
+                  <option value="Bachelor's">Bachelor's Degree (B.Tech / B.E / BCA / B.Sc)</option>
+                  <option value="Master's">Master's Degree (M.Tech / MBA / MCA / M.Sc)</option>
+                  <option value="PhD">PhD / Doctorate</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <hr class="border-slate-100 mb-8" />
+
+        <!-- ════ SECTION 3: Salary Details ════ -->
+        <div id="section-compensation" class="mb-8">
+          <h2 class="section-title text-base font-bold text-slate-800 mb-5">
+            <i class="fa-solid fa-indian-rupee-sign text-brand-500 mr-2"></i>Salary Details
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <!-- Current CTC -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="current_ctc">Current CTC (LPA)</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-sack-dollar" style="font-size:13px"></i>
+                <input type="number" id="current_ctc" name="current_ctc" min="0" step="0.1"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. 8.5" />
+              </div>
+            </div>
+
+            <!-- Expected CTC -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="expected_ctc">Expected CTC (LPA)</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-arrow-trend-up" style="font-size:13px"></i>
+                <input type="number" id="expected_ctc" name="expected_ctc" min="0" step="0.1"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="e.g. 12.0" />
+              </div>
+            </div>
+
+            <!-- Notice Period -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="notice_period">Notice Period</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-calendar-days"></i>
+                <select id="notice_period" name="notice_period"
+                  class="field-input field-select input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800">
+                  <option value="">-- Select Notice Period --</option>
+                  <option value="Immediate">Immediate / Serving Notice</option>
+                  <option value="15 Days">15 Days</option>
+                  <option value="30 Days">30 Days</option>
+                  <option value="60 Days">60 Days</option>
+                  <option value="90 Days">90 Days</option>
+                  <option value="More than 90 Days">More than 90 Days</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <hr class="border-slate-100 mb-8" />
+
+        <!-- ════ SECTION 4: Additional Information ════ -->
+        <div id="section-additional" class="mb-8">
+          <h2 class="section-title text-base font-bold text-slate-800 mb-5">
+            <i class="fa-solid fa-circle-info text-brand-500 mr-2"></i>Additional Information
+          </h2>
+          <div class="grid grid-cols-1 gap-5">
+
+            <!-- Reason for Change -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="reason_for_job_change">Reason for Job Change</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-comment-dots textarea-icon" style="top:14px; transform:none;"></i>
+                <textarea id="reason_for_job_change" name="reason_for_job_change" rows="3"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="Briefly describe why you're looking for a new opportunity…"></textarea>
+              </div>
+            </div>
+
+            <!-- Comments -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="comments">Additional Comments</label>
+              <div class="input-wrap">
+                <i class="fi fa-solid fa-pencil textarea-icon" style="top:14px; transform:none;"></i>
+                <textarea id="comments" name="comments" rows="3"
+                  class="field-input input-with-icon w-full border border-slate-200 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400"
+                  placeholder="Any other information you'd like to share…"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <hr class="border-slate-100 mb-8" />
+
+        <!-- ════ SECTION 5: Resume Upload ════ -->
+        <div id="section-resume" class="mb-8">
+          <h2 class="section-title text-base font-bold text-slate-800 mb-5">
+            <i class="fa-solid fa-file-arrow-up text-brand-500 mr-2"></i>Resume Upload
+          </h2>
+
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" />
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-brand-500/60 mb-3 block"></i>
+            <p class="text-slate-600 font-medium text-sm">
+              <span class="text-brand-600 font-semibold">Click to upload</span> or drag &amp; drop
+            </p>
+            <p class="text-xs text-slate-400 mt-1">PDF, DOC, DOCX · Max 5 MB</p>
+            <div id="fileNameBadge" class="hidden mt-3 inline-flex items-center gap-2 bg-brand-50 border border-brand-100 rounded-lg px-3 py-1.5 text-xs text-brand-700 font-medium">
+              <i class="fa-solid fa-paperclip"></i>
+              <span id="fileNameText"></span>
+            </div>
+          </div>
+          <p class="field-error" id="resumeError">Please upload your resume (PDF, DOC, or DOCX).</p>
+        </div>
+
+        <!-- ════ SUBMIT ════ -->
+        <div class="pt-2">
+          <p class="text-center text-xs text-slate-400 mb-4">
+            <i class="fa-solid fa-lock mr-1 text-slate-300"></i>
+            Your information is encrypted and kept strictly confidential.
+          </p>
+          <button type="submit" id="submitBtn" class="btn-primary">
+            <svg id="spinner" class="spinner w-5 h-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"></circle>
+              <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span id="btnText">Submit Application</span>
+            <i id="btnIcon" class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </main>
+
+  <!-- ════════════════ FOOTER ════════════════ -->
+  <footer class="text-center py-8 text-xs text-slate-400">
+    &copy; 2025 TalentBridge Pvt. Ltd. &nbsp;·&nbsp; All rights reserved &nbsp;·&nbsp; Powered by FastAPI &amp; MySQL
+  </footer>
+
+  <script src="/static/js/form.js"></script>
+</body>
+</html>
